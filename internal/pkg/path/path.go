@@ -2,6 +2,7 @@ package path
 
 import (
 	"os"
+	"path"
 )
 
 func IsDir(path string) bool {
@@ -14,10 +15,13 @@ func IsDir(path string) bool {
 }
 
 func CreateDir(path string) error {
-	err := os.MkdirAll(path, os.ModePerm)
-	if err != nil {
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func Join(dir, dirName string) string {
+	return path.Join(dir, dirName)
 }

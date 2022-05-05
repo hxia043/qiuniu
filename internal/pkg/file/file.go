@@ -1,7 +1,7 @@
 package file
 
 import (
-	"loki/internal/pkg/path"
+	"github/hxia043/qiuniu/internal/pkg/path"
 	"os"
 	"path/filepath"
 )

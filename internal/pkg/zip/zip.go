@@ -3,8 +3,8 @@ package zip
 import (
 	"archive/zip"
 	"fmt"
+	"github/hxia043/qiuniu/internal/pkg/path"
 	"io"
-	"loki/internal/pkg/path"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,7 +14,7 @@ var Dir string = ""
 
 func Zip(dir string) error {
 	if !path.IsDir(dir) {
-		err := fmt.Errorf("loki: the workdir %s is not a directory :(", dir)
+		err := fmt.Errorf("error: the workdir %s is not a directory", dir)
 		return err
 	}
 
@@ -66,6 +66,6 @@ func Zip(dir string) error {
 		return err
 	}
 
-	fmt.Printf("loki: compress content of dir %s into zip file %s\n", dir, zipFileName)
+	fmt.Printf("qiuniu: compress content of dir %s into zip file %s\n", dir, zipFileName)
 	return nil
 }

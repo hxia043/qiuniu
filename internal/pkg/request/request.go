@@ -2,6 +2,7 @@ package request
 
 import (
 	"crypto/tls"
+	"github/hxia043/qiuniu/internal/app/config"
 	"io"
 	"net/http"
 	"time"
@@ -23,13 +24,13 @@ const (
 type request struct {
 	Host     string
 	Port     string
-	Method   string
+	Method   method
 	IsVerify bool
 	Headers  map[string]string
 }
 
 func NewRequest(req *request, url string) (*http.Request, error) {
-	r, err := http.NewRequest(req.Method, url, nil)
+	r, err := http.NewRequest(string(req.Method), url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +51,6 @@ func HandleRequest(req *http.Request) ([]byte, error) {
 		},
 		Timeout: time.Duration(TIMEOUT_REQUEST) * time.Second,
 	}
-
 	defer client.CloseIdleConnections()
 
 	resp, err := client.Do(req)
@@ -76,5 +76,18 @@ func Handler(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return resp, err
+}
+
+func InitLogRequest() {
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/yaml"
+	headers["Authorization"] = "Bearer " + config.Config.Token
+
+	Request.Host = config.Config.Host
+	Request.Port = config.Config.Port
+	Request.IsVerify = config.Config.IsVerify
+	Request.Headers = headers
+	Request.Method = GET_REQUEST
 }

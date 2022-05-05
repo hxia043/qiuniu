@@ -1,18 +1,18 @@
 package clean
 
 import (
+	"fmt"
+	"github/hxia043/qiuniu/internal/pkg/path"
 	"io/ioutil"
 	"os"
-	"path"
 	"time"
 )
 
-var (
-	Interval time.Duration = 0
-	Workdir  string        = ""
-)
-
 func Clean(dir string, interval time.Duration) error {
+	if !path.IsDir(dir) {
+		return fmt.Errorf("error: the clean dir %s is not a directory", dir)
+	}
+
 	timeNow := time.Now()
 
 	fileInfos, err := ioutil.ReadDir(dir)

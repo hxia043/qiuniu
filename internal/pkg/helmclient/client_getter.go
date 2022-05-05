@@ -11,17 +11,18 @@ import (
 
 // RESTClientGetter defines the values of a helm REST client
 type RESTClientGetter struct {
-	kubeConfig   []byte
+	kubeconfig   []byte
 	clientConfig clientcmd.ClientConfig
 }
 
-func NewRESTClientGetter(kubeConfig []byte) (*RESTClientGetter, error) {
-	clientConfig, err := clientcmd.NewClientConfigFromBytes(kubeConfig)
+func NewRESTClientGetter(kubeconfig []byte) (*RESTClientGetter, error) {
+	clientConfig, err := clientcmd.NewClientConfigFromBytes(kubeconfig)
 	if err != nil {
 		return nil, err
 	}
+
 	return &RESTClientGetter{
-		kubeConfig:   kubeConfig,
+		kubeconfig:   kubeconfig,
 		clientConfig: clientConfig,
 	}, nil
 }
@@ -44,7 +45,7 @@ func (c *RESTClientGetter) ToDiscoveryClient() (discovery.CachedDiscoveryInterfa
 
 // ToRESTConfig returns a REST config build from a given kubeconfig
 func (c *RESTClientGetter) ToRESTConfig() (*rest.Config, error) {
-	return clientcmd.RESTConfigFromKubeConfig(c.kubeConfig)
+	return clientcmd.RESTConfigFromKubeConfig(c.kubeconfig)
 }
 
 func (c *RESTClientGetter) ToRESTMapper() (meta.RESTMapper, error) {
