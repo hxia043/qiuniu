@@ -27,6 +27,8 @@ func NewWorker() *Worker {
 		w.task = task.Clean
 	case task.HELM:
 		w.task = task.Helm
+	case task.SERVICE:
+		w.task = task.Service
 	}
 
 	return w

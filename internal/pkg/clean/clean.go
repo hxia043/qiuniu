@@ -33,9 +33,8 @@ func Clean(dir string, interval time.Duration) error {
 			return err
 		}
 
-		if timeNow.Sub(logTime).Seconds() > interval.Seconds() {
-			err := os.RemoveAll(path.Join(dir, dirName))
-			if err != nil {
+		if timeNow.Sub(logTime).Hours() > interval.Hours() {
+			if err := os.RemoveAll(path.Join(dir, dirName)); err != nil {
 				return err
 			}
 		}

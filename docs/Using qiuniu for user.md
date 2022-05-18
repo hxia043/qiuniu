@@ -155,3 +155,19 @@ $ pwd
 $ ls
 2022-05-05T03:01:19Z  2022-05-05T03:02:29Z
 ```
+
+## 6. clean
+`clean` is to clean the log according to the time interval between the collect time and the current time, for example:
+```
+$ qiuniu clean -w /var/home/core -i 24
+```
+
+It means clean the log over `24h` under workspace `/var/home/core`.
+
+## 7. zip
+`zip` command is used to compress the log to zip, for example:
+```
+$ qiuniu zip -d /var/home/core/qiuniu
+```
+
+It means to compress the log under `/var/home/core/qiuniu` to zip package `qiuniu.zip`.

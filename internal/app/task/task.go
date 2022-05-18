@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github/hxia043/qiuniu/internal/app/config"
 	"github/hxia043/qiuniu/internal/app/resource"
+	"github/hxia043/qiuniu/internal/app/service"
 	"github/hxia043/qiuniu/internal/pkg/clean"
 	"github/hxia043/qiuniu/internal/pkg/file"
 	"github/hxia043/qiuniu/internal/pkg/helmclient"
@@ -27,6 +28,7 @@ const (
 	ZIP     string = "zip"
 	CLEAN   string = "clean"
 	HELM    string = "helm"
+	SERVICE string = "service"
 
 	KIND string = "logs"
 )
@@ -58,7 +60,7 @@ func Help() error {
 	fmt.Println("    -d, --dir			the dir of compress the log")
 	fmt.Println("  clean")
 	fmt.Println("    -w, --workspace		the workspace for qiuniu")
-	fmt.Println("    -i, --interval		the time interval between log collect time and current time")
+	fmt.Println("    -i, --interval		the time interval between log collect time and current time, unit(h)")
 
 	return nil
 }
@@ -79,7 +81,7 @@ func Env() error {
 }
 
 func Zip() error {
-	err := zip.Zip(config.Config.ZipDir)
+	_, err := zip.Zip(config.Config.ZipDir)
 	return err
 }
 
@@ -137,6 +139,15 @@ func parseWorkspace(workspace string) string {
 	}
 
 	return dir
+}
+
+func Service() error {
+	s := service.New()
+	if err := s.Run(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func Helm() error {
@@ -215,7 +226,7 @@ func createDescriptionFile(id, dir string) error {
 }
 
 func Log() error {
-	request.InitLogRequest()
+	request.InitLogRequest(config.Config.Host, config.Config.Port, config.Config.Token, config.Config.IsVerify)
 
 	dir := parseWorkspace(config.Config.Workspace)
 	id, workdir, err := createWorkDir(dir)

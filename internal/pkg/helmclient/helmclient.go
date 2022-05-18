@@ -77,14 +77,13 @@ func NewHelmClient(options *Options) (Client, error) {
 		return nil, fmt.Errorf("new rest client getter failed: %w", err)
 	}
 
-	ns, _, err := clientGetter.ToRawKubeConfigLoader().Namespace()
-	if err != nil {
-		return nil, fmt.Errorf("get namespace from KubeConfig fail: %w", err)
-	}
-
 	// Helm does not expose Namespace property, it has to be configured in this environment way
-	if options.Namespace != "" {
-		ns = options.Namespace
+	ns := options.Namespace
+	if ns == "" {
+		ns, _, err = clientGetter.ToRawKubeConfigLoader().Namespace()
+		if err != nil {
+			return nil, fmt.Errorf("get namespace from KubeConfig fail: %w", err)
+		}
 	}
 
 	if err := os.Setenv("HELM_NAMESPACE", ns); err != nil {

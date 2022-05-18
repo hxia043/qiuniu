@@ -38,6 +38,18 @@ func parseConfigFromEnv() {
 	if workspace := os.Getenv(config.ENV_WORKSPACE); workspace != "" {
 		config.Config.Workspace, config.Env[config.ENV_WORKSPACE] = workspace, workspace
 	}
+
+	if serviceIp := os.Getenv(config.ENV_SERVICE_IP); serviceIp != "" {
+		config.Config.ServiceIp, config.Env[config.ENV_SERVICE_IP] = serviceIp, serviceIp
+	} else {
+		config.Config.ServiceIp = config.DefaultServiceIp
+	}
+
+	if servicePort := os.Getenv(config.ENV_SERVICE_PORT); servicePort != "" {
+		config.Config.ServicePort, config.Env[config.ENV_SERVICE_PORT] = servicePort, servicePort
+	} else {
+		config.Config.ServicePort = config.DefaultServicePort
+	}
 }
 
 // if there is the same config in env and command line
@@ -80,6 +92,8 @@ func parseCommandConfig(command string) (string, error) {
 		config.Config.Command = task.CLEAN
 	case task.HELM:
 		config.Config.Command = task.HELM
+	case task.SERVICE:
+		config.Config.Command = task.SERVICE
 	default:
 		task.Help()
 		err = errors.New("error: unexpected command options " + command)
@@ -125,7 +139,7 @@ func parseCleanOptions(command string, args []string) error {
 }
 
 func checkOptionsConfigAvaiable(command string, args []string) error {
-	if command != task.LOG && command != task.ZIP && command != task.CLEAN && command != task.HELM {
+	if command != task.LOG && command != task.ZIP && command != task.CLEAN && command != task.HELM && command != task.SERVICE {
 		if len(args) > 0 {
 			return errors.New("error: wrong options config for " + command)
 		}
@@ -184,6 +198,23 @@ func parseHelmOptions(command string, args []string) error {
 	return nil
 }
 
+func parseServiceOptions(command string, args []string) error {
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case options.SSERVICE_IP, options.LSERVICE_IP:
+			i += 1
+			config.Config.ServiceIp = args[i]
+		case options.SSERVICE_PORT, options.LSERVICE_PORT:
+			i += 1
+			config.Config.ServicePort = args[i]
+		default:
+			return errors.New("error: unexpected options config for " + command)
+		}
+	}
+
+	return nil
+}
+
 // @ToDo: The parse options will be instead of the Cobra in the future
 func parseOptionsConfig(command string, args []string) error {
 	if err := checkOptionsConfigAvaiable(command, args); err != nil {
@@ -210,6 +241,12 @@ func parseOptionsConfig(command string, args []string) error {
 
 	if command == task.HELM {
 		if err := parseHelmOptions(command, args); err != nil {
+			return err
+		}
+	}
+
+	if command == task.SERVICE {
+		if err := parseServiceOptions(command, args); err != nil {
 			return err
 		}
 	}

@@ -78,11 +78,12 @@ Options:
 2. Get qiuniu version
 ```
 $ qiuniu version
-qiuniu version: 1.0 Release  go version: go1.17.7
+qiuniu version: 0.1 Debug  go version: go1.17.7
 ```
 
 ## Docs
-1. Get start from the [user guide](https://github.com/hxia043/qiuniu/blob/main/docs/Using%20qiuniu%20for%20user.md)
+1. Get start from the user guide
+2. Get start from the developer guide
 
 ## Q&A
 1. raise issue from [issues](https://github.com/hxia043/qiuniu/issues)

@@ -2,7 +2,6 @@ package request
 
 import (
 	"crypto/tls"
-	"github/hxia043/qiuniu/internal/app/config"
 	"io"
 	"net/http"
 	"time"
@@ -80,14 +79,14 @@ func Handler(url string) ([]byte, error) {
 	return resp, err
 }
 
-func InitLogRequest() {
+func InitLogRequest(host, port, token string, isVerify bool) {
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/yaml"
-	headers["Authorization"] = "Bearer " + config.Config.Token
+	headers["Authorization"] = "Bearer " + token
 
-	Request.Host = config.Config.Host
-	Request.Port = config.Config.Port
-	Request.IsVerify = config.Config.IsVerify
+	Request.Host = host
+	Request.Port = port
+	Request.IsVerify = isVerify
 	Request.Headers = headers
 	Request.Method = GET_REQUEST
 }

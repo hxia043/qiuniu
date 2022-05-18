@@ -12,16 +12,16 @@ import (
 
 var Dir string = ""
 
-func Zip(dir string) error {
+func Zip(dir string) (string, error) {
 	if !path.IsDir(dir) {
 		err := fmt.Errorf("error: the workdir %s is not a directory", dir)
-		return err
+		return "", err
 	}
 
 	zipFileName := dir + ".zip"
 	zipFile, err := os.Create(zipFileName)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer func() { _ = zipFile.Close() }()
 
@@ -63,9 +63,9 @@ func Zip(dir string) error {
 	})
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	fmt.Printf("qiuniu: compress content of dir %s into zip file %s\n", dir, zipFileName)
-	return nil
+	return zipFileName, nil
 }
