@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "qiuniu.fullname" . }}
+  labels:
+    {{- include "qiuniu.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 9189
+      targetPort: 9189
+  selector:
+    {{- include "qiuniu.selectorLabels" . | nindent 4 }}

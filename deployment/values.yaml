@@ -1,0 +1,44 @@
+# Default values for qiuniu.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: image-registry.openshift-image-registry.svc:5000/<namespace>/qiuniu
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v2"
+
+imagePullSecrets: []
+nameOverride: "qiuniu"
+fullnameOverride: "qiuniu"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsUser: 9999
+  runAsGroup: 9999
+  fsGroup: 9999
+
+securityContext: {}
+
+service:
+  type: NodePort
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
