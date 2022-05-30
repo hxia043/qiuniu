@@ -77,8 +77,8 @@ $ qiuniu version
 qiuniu version: 1.0 Release  go version: go1.17.7
 ```
 
-## 2. Instanll qiuniu with Helm Chart
-The helm chart under the directory of deployment, can deploy the qiuniu by `helm install`:
+## 2. Install qiuniu with Helm Chart
+Deploy qiuniu by `helm install`, the helm chart which is under the directory of deployment:
 ```
 $ cd /deployment
 $ helm install qiuniu .
@@ -87,8 +87,8 @@ $ helm install qiuniu .
 Before deployment, please update the `repository` under the image field of `values.yaml`.
 
 ## Docs
-1. Get start for command line mode of qiuniu.
-2. Get start for service mode of qiuniu.
+1. Get start for [command line mode of qiuniu](https://github.com/hxia043/qiuniu/blob/main/docs/Using%20qiuniu%20with%20command%20line.md).
+2. Get start for [service mode of qiuniu](https://github.com/hxia043/qiuniu/blob/main/docs/Using%20qiuniu%20with%20container.md).
 
 ## Q&A
 1. raise issue from [issues](https://github.com/hxia043/qiuniu/issues)

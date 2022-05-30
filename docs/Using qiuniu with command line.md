@@ -38,7 +38,7 @@ Let's using the command one by one.
 ## 2. version
 Get the version of qiuniu by `qiuniu version`:
 ```
-qiuniu version: 2.0 Release  go version: go1.17.7
+qiuniu version: 1.0 Release  go version: go1.17.7
 ```
 
 ## 3. env
@@ -77,7 +77,17 @@ $ qiuniu log -k [kubeconfig_path] -n [namespace] -w [workspace]
 ```
 
 ### 4.2 collect log by env
-1) Set env as chapter `2. env`
+1) Set env to specific the configuration of:
+```
+QIUNIU_NAMESPACE=
+QIUNIU_WORKSPACE=
+QIUNIU_KUBECONFIG=
+```
+
+for example:
+```
+$ export QIUNIU_NAMESPACE=ci1
+```
 
 2) collect log
 ```
@@ -151,4 +161,4 @@ $ ./qiuniu service
 
 qiuniu will listening to the localhost and port `9189` by default, can change the serviceIP and servicePort with options `-si` and `-sp`.
 
-For the detailed info of service OpenAPI, please refer here. 
+For the detailed info of service OpenAPI, please refer [here](https://github.com/hxia043/qiuniu/blob/main/api/openapi.yaml). 

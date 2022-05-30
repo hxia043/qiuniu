@@ -38,4 +38,4 @@ NOTES:
   echo "Visit http://$NODE_IP:$NODE_PORT to use qiuniu"
 ```
 
-For the OpenAPI of qiuniu, please refer here.
+For the OpenAPI of qiuniu, please refer [here](https://github.com/hxia043/qiuniu/blob/main/api/openapi.yaml).
