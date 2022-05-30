@@ -4,10 +4,10 @@ The qiuniu image has been stored in [docker hub](https://hub.docker.com/reposito
 
 pull qiuniu to local by:
 ```
-$ docker pull hxia043/qiuniu:v2
+$ docker pull hxia043/qiuniu:latest
 
 $ docker images | grep qiuniu
-hxia043/qiuniu         v2              a2abff5bb4c9   14 minutes ago   380MB
+hxia043/qiuniu         latest              710da4187a5c   14 minutes ago   380MB
 ```
 
 ## helm install qiuniu
