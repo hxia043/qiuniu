@@ -1,24 +1,48 @@
 package collector
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github/hxia043/qiuniu/internal/pkg/file"
 	"github/hxia043/qiuniu/internal/pkg/path"
 	"github/hxia043/qiuniu/internal/pkg/request"
+	"io"
+	"net/http"
+	"time"
 )
 
 type Collector struct {
 	Dir string
 }
 
-func (c *Collector) CollectLog(url string) ([]byte, error) {
-	resp, err := request.Handler(url)
+func (c *Collector) CollectLog(token, url string) ([]byte, error) {
+	req, err := request.NewRequest(request.GET_REQUEST, token, url)
 	if err != nil {
 		return nil, err
 	}
 
-	return resp, nil
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: request.IsSkipVerifyDefault,
+			},
+		},
+		Timeout: time.Duration(request.Timeout) * time.Second,
+	}
+	defer client.CloseIdleConnections()
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
 }
 
 func (c *Collector) GenerateContainerLog(resp []byte, path string) error {

@@ -6,20 +6,18 @@ var Config *config = new(config)
 var Env map[string]string = make(map[string]string)
 
 const (
-	ENV_HOST         string = "QIUNIU_HOST"
-	ENV_PORT         string = "QIUNIU_PORT"
-	ENV_TOKEN        string = "QIUNIU_TOKEN"
 	ENV_NAMESPACE    string = "QIUNIU_NAMESPACE"
 	ENV_WORKSPACE    string = "QIUNIU_WORKSPACE"
+	ENV_KUBECONFIG   string = "QIUNIU_KUBECONFIG"
 	ENV_SERVICE_IP   string = "QIUNIU_SERVICE_IP"
 	ENV_SERVICE_PORT string = "QIUNIU_SERVICE_PORT"
 )
 
 var (
-	Version string = "1.1"
+	Version string = "1.0"
 
 	// Type: Draft or Release
-	Type string = "Draft"
+	Type string = "Release"
 
 	DefaultServiceIp   string = "0.0.0.0"
 	DefaultServicePort string = "9189"
@@ -28,9 +26,6 @@ var (
 )
 
 type config struct {
-	Host        string
-	Port        string
-	Token       string
 	Command     string
 	IsVerify    bool
 	Namespace   string
@@ -41,12 +36,4 @@ type config struct {
 	Kubeconfig  string
 	ServiceIp   string
 	ServicePort string
-}
-
-func init() {
-	Env[ENV_HOST] = ""
-	Env[ENV_PORT] = ""
-	Env[ENV_TOKEN] = ""
-	Env[ENV_NAMESPACE] = ""
-	Env[ENV_WORKSPACE] = ""
 }

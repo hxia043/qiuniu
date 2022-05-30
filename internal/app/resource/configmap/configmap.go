@@ -5,21 +5,24 @@ import (
 	"github/hxia043/qiuniu/internal/app/collector"
 	"github/hxia043/qiuniu/internal/app/config"
 	"github/hxia043/qiuniu/internal/pkg/path"
-	"github/hxia043/qiuniu/internal/pkg/request"
 )
 
-var configmapUrlPattern string = "https://%s:%s/api/v1/namespaces/%s/configmaps"
+var configmapUrlPattern string = "%s/api/v1/namespaces/%s/configmaps"
 
 type ConfigMap struct {
+	host      string
+	token     string
 	namespace string
 	logDir    string
 }
 
 func (c *ConfigMap) Log() error {
+	fmt.Println("Info: collect configmap log start...")
+
 	collector := collector.NewCollector()
 
-	configmapUrl := fmt.Sprintf(configmapUrlPattern, request.Request.Host, request.Request.Port, c.namespace)
-	resp, err := collector.CollectLog(configmapUrl)
+	configmapUrl := fmt.Sprintf(configmapUrlPattern, c.host, c.namespace)
+	resp, err := collector.CollectLog(c.token, configmapUrl)
 	if err != nil {
 		return err
 	}
@@ -28,11 +31,15 @@ func (c *ConfigMap) Log() error {
 		return err
 	}
 
+	fmt.Println("Info: collect configmap log finished.")
+
 	return nil
 }
 
-func NewConfigMap(dir string) *ConfigMap {
+func NewConfigMap(host, token, dir string) *ConfigMap {
 	return &ConfigMap{
+		host:      host,
+		token:     token,
 		namespace: config.Config.Namespace,
 		logDir:    path.Join(dir, "configmap"),
 	}

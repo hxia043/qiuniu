@@ -5,21 +5,24 @@ import (
 	"github/hxia043/qiuniu/internal/app/collector"
 	"github/hxia043/qiuniu/internal/app/config"
 	"github/hxia043/qiuniu/internal/pkg/path"
-	"github/hxia043/qiuniu/internal/pkg/request"
 )
 
-var endpointUrlPattern string = "https://%s:%s/api/v1/namespaces/%s/endpoints"
+var endpointUrlPattern string = "%s/api/v1/namespaces/%s/endpoints"
 
 type Endpoint struct {
+	host      string
+	token     string
 	namespace string
 	logDir    string
 }
 
 func (e *Endpoint) Log() error {
+	fmt.Println("Info: collect endpoint log start...")
+
 	collector := collector.NewCollector()
 
-	endpointUrl := fmt.Sprintf(endpointUrlPattern, request.Request.Host, request.Request.Port, e.namespace)
-	resp, err := collector.CollectLog(endpointUrl)
+	endpointUrl := fmt.Sprintf(endpointUrlPattern, e.host, e.namespace)
+	resp, err := collector.CollectLog(e.token, endpointUrl)
 	if err != nil {
 		return err
 	}
@@ -28,11 +31,15 @@ func (e *Endpoint) Log() error {
 		return err
 	}
 
+	fmt.Println("Info: collect endpoint log finished.")
+
 	return nil
 }
 
-func NewEndpoint(dir string) *Endpoint {
+func NewEndpoint(host, token, dir string) *Endpoint {
 	return &Endpoint{
+		host:      host,
+		token:     token,
 		namespace: config.Config.Namespace,
 		logDir:    path.Join(dir, "endpoint"),
 	}

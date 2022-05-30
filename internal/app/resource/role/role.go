@@ -5,21 +5,24 @@ import (
 	"github/hxia043/qiuniu/internal/app/collector"
 	"github/hxia043/qiuniu/internal/app/config"
 	"github/hxia043/qiuniu/internal/pkg/path"
-	"github/hxia043/qiuniu/internal/pkg/request"
 )
 
-var roleUrlPattern string = "https://%s:%s/apis/rbac.authorization.k8s.io/v1/namespaces/%s/roles"
+var roleUrlPattern string = "%s/apis/rbac.authorization.k8s.io/v1/namespaces/%s/roles"
 
 type Role struct {
+	host      string
+	token     string
 	namespace string
 	logDir    string
 }
 
 func (r *Role) Log() error {
+	fmt.Println("Info: collect role log start...")
+
 	collector := collector.NewCollector()
 
-	roleUrl := fmt.Sprintf(roleUrlPattern, request.Request.Host, request.Request.Port, r.namespace)
-	resp, err := collector.CollectLog(roleUrl)
+	roleUrl := fmt.Sprintf(roleUrlPattern, r.host, r.namespace)
+	resp, err := collector.CollectLog(r.token, roleUrl)
 	if err != nil {
 		return err
 	}
@@ -28,11 +31,15 @@ func (r *Role) Log() error {
 		return err
 	}
 
+	fmt.Println("Info: collect role log finished.")
+
 	return nil
 }
 
-func NewRole(dir string) *Role {
+func NewRole(host, token, dir string) *Role {
 	return &Role{
+		host:      host,
+		token:     token,
 		namespace: config.Config.Namespace,
 		logDir:    path.Join(dir, "role"),
 	}

@@ -5,40 +5,41 @@ import (
 	"github/hxia043/qiuniu/internal/app/collector"
 	"github/hxia043/qiuniu/internal/app/config"
 	"github/hxia043/qiuniu/internal/pkg/path"
-	"github/hxia043/qiuniu/internal/pkg/request"
 )
 
-var containerUrlPattern string = "https://%s:%s/api/v1/namespaces/%s/pods/%s/log"
+var containerUrlPattern string = "%s/api/v1/namespaces/%s/pods/%s/log"
 
 type Container struct {
-	Name      string
-	Namespace string
+	name      string
+	namespace string
 	logDir    string
-	PodName   string
+	podName   string
+	host      string
+	token     string
 }
 
 func (c *Container) collectContainerLog(isPrevious bool) error {
 	collector := collector.NewCollector()
 
 	// common means common part url for previous-container and current-container
-	commonContainerUrl := fmt.Sprintf(containerUrlPattern, request.Request.Host, request.Request.Port, c.Namespace, c.PodName)
+	commonContainerUrl := fmt.Sprintf(containerUrlPattern, c.host, c.namespace, c.podName)
 
 	logDir := ""
 	containerUrl := ""
 	if isPrevious {
-		logDir = path.Join(c.logDir+"/previous-container", c.Name)
-		containerUrl = commonContainerUrl + "?previous=true&container=" + c.Name
+		logDir = path.Join(c.logDir+"/previous-container", c.name)
+		containerUrl = commonContainerUrl + "?previous=true&container=" + c.name
 	} else {
-		logDir = path.Join(c.logDir+"/current-container", c.Name)
-		containerUrl = commonContainerUrl + "?container=" + c.Name
+		logDir = path.Join(c.logDir+"/current-container", c.name)
+		containerUrl = commonContainerUrl + "?container=" + c.name
 	}
 
-	resp, err := collector.CollectLog(containerUrl)
+	resp, err := collector.CollectLog(c.token, containerUrl)
 	if err != nil {
 		return err
 	}
 
-	logPath := fmt.Sprintf("%s/%s.log", logDir, c.Name)
+	logPath := fmt.Sprintf("%s/%s.log", logDir, c.name)
 	if err = collector.GenerateContainerLog(resp, logPath); err != nil {
 		return err
 	}
@@ -60,11 +61,13 @@ func (c *Container) Log() error {
 	return nil
 }
 
-func NewContainer(podName, containerName, dir string) *Container {
+func NewContainer(podName, containerName, dir, host, token string) *Container {
 	return &Container{
-		Name:      containerName,
-		Namespace: config.Config.Namespace,
+		name:      containerName,
+		namespace: config.Config.Namespace,
 		logDir:    path.Join(dir, podName),
-		PodName:   podName,
+		podName:   podName,
+		host:      host,
+		token:     token,
 	}
 }

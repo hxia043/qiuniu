@@ -5,21 +5,24 @@ import (
 	"github/hxia043/qiuniu/internal/app/collector"
 	"github/hxia043/qiuniu/internal/app/config"
 	"github/hxia043/qiuniu/internal/pkg/path"
-	"github/hxia043/qiuniu/internal/pkg/request"
 )
 
-var eventUrlPattern string = "https://%s:%s/api/v1/namespaces/%s/events/"
+var eventUrlPattern string = "%s/api/v1/namespaces/%s/events/"
 
 type Event struct {
+	host      string
+	token     string
 	namespace string
 	logDir    string
 }
 
 func (e *Event) Log() error {
+	fmt.Println("Info: collect event log start...")
+
 	collector := collector.NewCollector()
 
-	eventUrl := fmt.Sprintf(eventUrlPattern, request.Request.Host, request.Request.Port, e.namespace)
-	resp, err := collector.CollectLog(eventUrl)
+	eventUrl := fmt.Sprintf(eventUrlPattern, e.host, e.namespace)
+	resp, err := collector.CollectLog(e.token, eventUrl)
 	if err != nil {
 		return err
 	}
@@ -28,11 +31,15 @@ func (e *Event) Log() error {
 		return err
 	}
 
+	fmt.Println("Info: collect event log finished.")
+
 	return nil
 }
 
-func NewEvent(dir string) *Event {
+func NewEvent(host, token, dir string) *Event {
 	return &Event{
+		host:      host,
+		token:     token,
 		namespace: config.Config.Namespace,
 		logDir:    path.Join(dir, "event"),
 	}

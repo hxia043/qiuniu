@@ -1,4 +1,7 @@
 # Qiuniu
+
+## 0. Overview
+
 qiuniu is a log collector for application based on Kubernetes.
 
 ![avatar](./image/qiuniu.png)
@@ -23,7 +26,7 @@ qiuniu can support user to collect these logs of application:
 - storageclass
 - helm
 
-## Installation
+## 1. Install qiuniu with CLI
 To install qiuniu, you need to install Go and set your Go workspace first.
 
 1. Clone qiuniu from github
@@ -42,48 +45,50 @@ $ go build -o qiuniu main.go
 mv qiuniu /usr/bin
 ```
 
-## Quickly start
+### 1.1 Quickly start
 1. Find help from help command
 ```
-$qiuniu help
+$ qiuniu help
 The log collector for Kubernetes application
 
 Available Commands:
-  help                  help for qiuniu
-  version               print the qiuniu version information
-  env                   qiuniu client env information
+  help                  print help information
+  version               print the version information
+  env                   print host env information
+  log                   collect the kubernetes application log
   zip                   compress the log
   clean                 clean the log
-  helm                  collect the helm release log for application
-  log                   collect the kubernetes application log
 
 Options:
   log
-    -h, --host                  kubernetes cluster hostname or ip
-    -p, --port                  kubernetes cluster port
-    -t, --token                 kubernetes cluster token
     -n, --namespace             kubernetes cluster namespace
-    -w, --workspace             the workspace for qiuniu
-  helm
+    -w, --workspace             the workspace of qiuniu
     -k, --kubeconfig            local kubeconfig path of kubernetes cluster
-    -n, --namespace             kubernetes cluster namespace
-    -w, --workspace             the workspace for qiuniu
   zip
     -d, --dir                   the dir of compress the log
   clean
     -w, --workspace             the workspace for qiuniu
-    -i, --interval              the time interval between log collect time and current time
+    -i, --interval              the time interval between log collect time and current time, unit(h)
 ```
 
 2. Get qiuniu version
 ```
 $ qiuniu version
-qiuniu version: 0.1 Debug  go version: go1.17.7
+qiuniu version: 1.0 Release  go version: go1.17.7
 ```
 
+## 2. Instanll qiuniu with Helm Chart
+The helm chart under the directory of deployment, can deploy the qiuniu by `helm install`:
+```
+$ cd /deployment
+$ helm install qiuniu .
+```
+
+Before deployment, please update the `repository` under the image field of `values.yaml`.
+
 ## Docs
-1. Get start from the user guide
-2. Get start from the developer guide
+1. Get start for command line mode of qiuniu.
+2. Get start for service mode of qiuniu.
 
 ## Q&A
 1. raise issue from [issues](https://github.com/hxia043/qiuniu/issues)

@@ -25,8 +25,6 @@ func NewWorker() *Worker {
 		w.task = task.Zip
 	case task.CLEAN:
 		w.task = task.Clean
-	case task.HELM:
-		w.task = task.Helm
 	case task.SERVICE:
 		w.task = task.Service
 	}

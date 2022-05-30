@@ -19,36 +19,34 @@ func (p *Parser) Parse() error {
 }
 
 func parseConfigFromEnv() {
-	if host := os.Getenv(config.ENV_HOST); host != "" {
-		config.Config.Host, config.Env[config.ENV_HOST] = host, host
-	}
-
-	if port := os.Getenv(config.ENV_PORT); port != "" {
-		config.Config.Port, config.Env[config.ENV_PORT] = port, port
-	}
-
-	if token := os.Getenv(config.ENV_TOKEN); token != "" {
-		config.Config.Token, config.Env[config.ENV_TOKEN] = token, token
-	}
-
 	if namespace := os.Getenv(config.ENV_NAMESPACE); namespace != "" {
 		config.Config.Namespace, config.Env[config.ENV_NAMESPACE] = namespace, namespace
+	} else {
+		config.Env[config.ENV_NAMESPACE] = ""
 	}
 
 	if workspace := os.Getenv(config.ENV_WORKSPACE); workspace != "" {
 		config.Config.Workspace, config.Env[config.ENV_WORKSPACE] = workspace, workspace
+	} else {
+		config.Env[config.ENV_WORKSPACE] = ""
+	}
+
+	if kubeconfig := os.Getenv(config.ENV_KUBECONFIG); kubeconfig != "" {
+		config.Config.Workspace, config.Env[config.ENV_KUBECONFIG] = kubeconfig, kubeconfig
+	} else {
+		config.Env[config.ENV_KUBECONFIG] = ""
 	}
 
 	if serviceIp := os.Getenv(config.ENV_SERVICE_IP); serviceIp != "" {
 		config.Config.ServiceIp, config.Env[config.ENV_SERVICE_IP] = serviceIp, serviceIp
 	} else {
-		config.Config.ServiceIp = config.DefaultServiceIp
+		config.Config.ServiceIp, config.Env[config.ENV_SERVICE_IP] = config.DefaultServiceIp, serviceIp
 	}
 
 	if servicePort := os.Getenv(config.ENV_SERVICE_PORT); servicePort != "" {
 		config.Config.ServicePort, config.Env[config.ENV_SERVICE_PORT] = servicePort, servicePort
 	} else {
-		config.Config.ServicePort = config.DefaultServicePort
+		config.Config.ServicePort, config.Env[config.ENV_SERVICE_PORT] = config.DefaultServicePort, servicePort
 	}
 }
 
@@ -90,8 +88,6 @@ func parseCommandConfig(command string) (string, error) {
 		config.Config.Command = task.ZIP
 	case task.CLEAN:
 		config.Config.Command = task.CLEAN
-	case task.HELM:
-		config.Config.Command = task.HELM
 	case task.SERVICE:
 		config.Config.Command = task.SERVICE
 	default:
@@ -139,7 +135,7 @@ func parseCleanOptions(command string, args []string) error {
 }
 
 func checkOptionsConfigAvaiable(command string, args []string) error {
-	if command != task.LOG && command != task.ZIP && command != task.CLEAN && command != task.HELM && command != task.SERVICE {
+	if command != task.LOG && command != task.ZIP && command != task.CLEAN && command != task.SERVICE {
 		if len(args) > 0 {
 			return errors.New("error: wrong options config for " + command)
 		}
@@ -155,41 +151,15 @@ func checkOptionsConfigAvaiable(command string, args []string) error {
 func parseLogOptions(command string, args []string) error {
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
-		case options.SHOST, options.LHOST:
-			i += 1
-			config.Config.Host = args[i]
-		case options.SPORT, options.LPORT:
-			i = i + 1
-			config.Config.Port = args[i]
-		case options.STOKEN, options.LTOKEN:
-			i = i + 1
-			config.Config.Token = args[i]
 		case options.SNAMESPACE, options.LNAMESPACE:
 			i = i + 1
 			config.Config.Namespace = args[i]
 		case options.SWORKSPACE, options.LWORKSPACE:
 			i = i + 1
 			config.Config.Workspace = args[i]
-		default:
-			return errors.New("error: unexpected options config for " + command)
-		}
-	}
-
-	return nil
-}
-
-func parseHelmOptions(command string, args []string) error {
-	for i := 0; i < len(args); i++ {
-		switch args[i] {
 		case options.SKUBECONFIG, options.LKUBECONFIG:
-			i += 1
+			i = i + 1
 			config.Config.Kubeconfig = args[i]
-		case options.SWORKSPACE, options.LWORKSPACE:
-			i += 1
-			config.Config.Workspace = args[i]
-		case options.SNAMESPACE, options.LNAMESPACE:
-			i += 1
-			config.Config.Namespace = args[i]
 		default:
 			return errors.New("error: unexpected options config for " + command)
 		}
@@ -235,12 +205,6 @@ func parseOptionsConfig(command string, args []string) error {
 
 	if command == task.LOG {
 		if err := parseLogOptions(command, args); err != nil {
-			return err
-		}
-	}
-
-	if command == task.HELM {
-		if err := parseHelmOptions(command, args); err != nil {
 			return err
 		}
 	}

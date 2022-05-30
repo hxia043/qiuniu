@@ -16,6 +16,7 @@ func (c *Controller) RegisterRouter(engine *gin.Engine) {
 	v1Group.POST("/log", models.CollectLog)
 	v1Group.GET("/list", models.ListLog)
 	v1Group.GET("/download", models.DownloadLog)
+	v1Group.DELETE("/clean", models.CleanLog)
 }
 
 func New() *Controller {

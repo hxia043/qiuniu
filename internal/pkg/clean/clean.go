@@ -24,6 +24,10 @@ func Clean(dir string, interval time.Duration) error {
 	for _, fileInfo := range fileInfos {
 		if fileInfo.IsDir() {
 			dirNames = append(dirNames, fileInfo.Name())
+		} else {
+			if err := os.RemoveAll(path.Join(dir, fileInfo.Name())); err != nil {
+				return err
+			}
 		}
 	}
 

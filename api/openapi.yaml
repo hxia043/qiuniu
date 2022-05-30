@@ -1,0 +1,298 @@
+openapi: '3.0.2'
+info:
+  title: qiuniu 
+  version: '1.0'
+  description:  a log collector for kubernetes application
+  contact:
+    name: hxia043
+    url: https://github.com/hxia043/qiuniu/issues
+    email: xiahuyun043@126.com
+servers:
+- url: "http://{host}:{port}/qiuniu/{version}"
+  description: qiuniu service endpoint
+  variables:
+    host:
+      default: 127.0.0.1
+      description: the listening ip of qiuniu
+    port:
+      default: "9189"
+      description: the listening port of qiuniu
+    version:
+      default: v1
+paths:
+  /version:
+    summary: get service version information
+    description: get service version, include go version and qiuniu version
+    get:
+      summary: get service version information
+      description: get service version, include go version and qiuniu version
+      tags:
+      - service
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: service response status code
+                  success:
+                    type: boolean
+                    description: service response flag
+                  message:
+                    type: object
+                    description: service response message
+                    properties:
+                      qiuniu_type:
+                        type: string
+                        description: service version type
+                      qiuniu_version:
+                        type: string
+                        description: service version id
+                      go_version:
+                        type: string
+                        description: go version
+              example: |-
+                {
+                    "code": 201,
+                    "success": true,
+                    "message": {
+                        "qiuniu_version": "2.0",
+                        "go_version": "go1.15.6",
+                        "qiuniu_type": "Release"
+                    }
+                }  
+  /ping:
+    summary: get service availability status
+    description:  get service availability status
+    get:
+      summary: get service availability status
+      description: get service availability status
+      tags:
+      - service
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: service response status code
+                  success:
+                    type: boolean
+                    description: service response flag
+                  message:
+                    type: string
+                    description: service response message
+              example: |-
+                {
+                    "code": 201,
+                    "success": true,
+                    "message": "pong"
+                }
+  /log:
+    summary: collect Kubernetes logs
+    description: collect Kubernetes logs according to kubeconfig and namespace
+    post:
+      summary: collect Kubernetes logs
+      description: collect Kubernetes logs according to kubeconfig and namespace
+      tags:
+      - service
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: service response status code
+                  success:
+                    type: boolean
+                    description: service response flag
+                  message:
+                    type: string
+                    description: service response message
+              example: |-
+                {
+                    "code": 201,
+                    "success": true,
+                    "message": "log collect finished"
+                }
+        '403':
+          description: Forbidden
+          content:
+           application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: service response status code
+                  success:
+                    type: boolean
+                    description: service response flag
+                  message:
+                    type: object
+                    description: service response message
+              example: |-
+                {
+                    "code": 403,
+                    "success": false,
+                    "message": {}
+                }
+      requestBody:
+        description: request body for log collect
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/log-collect-upload'
+  /list:
+    summary: list collected logs
+    description: list the info of collected logs
+    get:
+      summary: list collected logs
+      description: list collected logs
+      tags:
+      - service
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: service response status code
+                  success:
+                    type: boolean
+                    description: service response flag
+                  message:
+                    type: object
+                    description: service response message
+                    properties:
+                      Kind:
+                        type: string
+                        description: log type
+                      Items:
+                        type: array
+                        description: the item of collected log
+                        properties:
+                          collect_time:
+                            type: string
+                            description: collected time
+                          host:
+                            type: string
+                            description: collected host
+                          name:
+                            type: string
+                            description: collected log name
+              example: |-
+                {
+                    "code": 201,
+                    "success": true,
+                    "message": {
+                      "Kind": "logs",
+                      "Items": [
+                        {
+                          "collect_time": "2022-05-30T05:14:39Z",
+                          "host": "https://127.0.0.1:6443",
+                          "name": "2022-05-30T05:14:39Z"
+                        }
+                      ]
+                    }
+                }
+        '403':
+          description: Forbidden
+          content:
+           application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: service response status code
+                  success:
+                    type: boolean
+                    description: service response flag
+                  message:
+                    type: object
+                    description: service response message
+              example: |-
+                {
+                    "code": 403,
+                    "success": false,
+                    "message": {}
+                }  
+  /download:
+    summary: download collected logs
+    description: download the collected logs
+    get:
+      summary: download the collected logs
+      description: download the collected logs with zip
+      tags:
+      - service
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: object
+                format: binary
+        '403':
+          description: Forbidden
+          content:
+           application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: service response status code
+                  success:
+                    type: boolean
+                    description: service response flag
+                  message:
+                    type: object
+                    description: service response message
+              example: |-
+                {
+                    "code": 403,
+                    "success": false,
+                    "message": {}
+                }  
+
+components:
+  schemas:
+    log-collect-upload:
+      title: log collect configuration
+      type: object
+      description: >
+        upload config for log collect
+      required:
+        - "kubeconfig"
+      properties:
+        kubeconfig:
+          type: string
+          format: binary
+          description: kubecofig of Kubenetes
+        namespace:
+          title: namespace
+          type: string
+          description: namespace of Kubernetes
+
+tags:
+- name: service
+  description: Application operation

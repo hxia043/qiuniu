@@ -33,6 +33,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/opt/qiuniu", "service"]
+          livenessProbe:
+            httpGet:
+             path: /qiuniu/v1/ping
+             port: 9189
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

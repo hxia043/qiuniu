@@ -5,21 +5,24 @@ import (
 	"github/hxia043/qiuniu/internal/app/collector"
 	"github/hxia043/qiuniu/internal/app/config"
 	"github/hxia043/qiuniu/internal/pkg/path"
-	"github/hxia043/qiuniu/internal/pkg/request"
 )
 
-var serviceUrlPattern string = "https://%s:%s/api/v1/namespaces/%s/services"
+var serviceUrlPattern string = "%s/api/v1/namespaces/%s/services"
 
 type Service struct {
+	host      string
+	token     string
 	namespace string
 	logDir    string
 }
 
 func (s *Service) Log() error {
+	fmt.Println("Info: collect service log start...")
+
 	collector := collector.NewCollector()
 
-	serviceUrl := fmt.Sprintf(serviceUrlPattern, request.Request.Host, request.Request.Port, s.namespace)
-	resp, err := collector.CollectLog(serviceUrl)
+	serviceUrl := fmt.Sprintf(serviceUrlPattern, s.host, s.namespace)
+	resp, err := collector.CollectLog(s.token, serviceUrl)
 	if err != nil {
 		return err
 	}
@@ -28,11 +31,15 @@ func (s *Service) Log() error {
 		return err
 	}
 
+	fmt.Println("Info: collect service log finished.")
+
 	return nil
 }
 
-func NewService(dir string) *Service {
+func NewService(host, token, dir string) *Service {
 	return &Service{
+		host:      host,
+		token:     token,
 		namespace: config.Config.Namespace,
 		logDir:    path.Join(dir, "service"),
 	}

@@ -3,35 +3,34 @@
 Here let's using qiuniu to collect the application log.
 
 ## 1. Help
-Get help from qiuniu by `qiuniu help`:
+Get help of qiuniu:
 ```
+$ qiuniu help
+
 The log collector for Kubernetes application
 
 Available Commands:
-  help                  help for qiuniu
-  version               print the qiuniu version information
-  env                   qiuniu client env information
+  help                  print help information
+  version               print the version information
+  env                   print host env information
+  log                   collect the kubernetes application log
   zip                   compress the log
   clean                 clean the log
-  helm                  collect the helm release log for application
-  log                   collect the kubernetes application log
+  service               provide the log collect service by restful api
 
 Options:
   log
-    -h, --host                  kubernetes cluster hostname or ip
-    -p, --port                  kubernetes cluster port
-    -t, --token                 kubernetes cluster token
     -n, --namespace             kubernetes cluster namespace
-    -w, --workspace             the workspace for qiuniu
-  helm
+    -w, --workspace             the workspace of qiuniu
     -k, --kubeconfig            local kubeconfig path of kubernetes cluster
-    -n, --namespace             kubernetes cluster namespace
-    -w, --workspace             the workspace for qiuniu
   zip
     -d, --dir                   the dir of compress the log
   clean
     -w, --workspace             the workspace for qiuniu
-    -i, --interval              the time interval between log collect time and current time
+    -i, --interval              the time interval between log collect time and current time, unit(h)
+  service
+    -si, --service-ip           listening ip of qiuniu
+    -sp, --service-port         listening port of qiuniu
 ```
 
 Let's using the command one by one.
@@ -39,27 +38,23 @@ Let's using the command one by one.
 ## 2. version
 Get the version of qiuniu by `qiuniu version`:
 ```
-$ qiuniu version
-qiuniu version: 1.0 Release  go version: go1.17.7
+qiuniu version: 2.0 Release  go version: go1.17.7
 ```
 
 ## 3. env
 Get the env of qiuniu by `qiuniu env`:
 ```
-$ qiuniu env
-QIUNIU_PORT=
-QIUNIU_TOKEN=
 QIUNIU_NAMESPACE=
 QIUNIU_WORKSPACE=
-QIUNIU_HOST=
+QIUNIU_KUBECONFIG=
+QIUNIU_SERVICE_IP=
+QIUNIU_SERVICE_PORT=
 ```
 
-qiuniu get the env from system, the default env is empty, it can set by user manully.
+qiuniu get the env from os, the default env is empty, it can set by user manually.
 
 For example, set env:
 ```
-$ export QIUNIU_HOST=127.0.0.1
-$ export QIUNIU_PORT=6443
 $ export QIUNIU_NAMESPACE=demo
 $ export QIUNIU_WORKSPACE=/home
 ```
@@ -67,11 +62,8 @@ $ export QIUNIU_WORKSPACE=/home
 Get the env:
 ```
 $ qiuniu env
-QIUNIU_PORT=6443
-QIUNIU_TOKEN=
 QIUNIU_NAMESPACE=demo
 QIUNIU_WORKSPACE=/home
-QIUNIU_HOST=127.0.0.1
 ```
 
 *Notice: The env is to simplify the options of log command, if no log options specific the env will be used. Otherwise, the log options will be used.*
@@ -81,7 +73,7 @@ Collect the application log by `qiuniu log`.
 
 ### 4.1 collect log by options
 ```
-$ qiuniu log -h [host] -p [port] -t [token] -n [namespace] -w [workspace]
+$ qiuniu log -k [kubeconfig_path] -n [namespace] -w [workspace]
 ```
 
 ### 4.2 collect log by env
@@ -92,16 +84,7 @@ $ qiuniu log -h [host] -p [port] -t [token] -n [namespace] -w [workspace]
 $ qiuniu log
 ```
 
-
-For the host, port and token info can be checked from the kubernetes cluster kubeconfig, more detailed can refer [here](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/).
-
-If there is no error raised up, it means log collect finished:
-```
-$ qiuniu log -h 10.10.xxx.xxx -p 6443 -t sha256~x8C4ouzPt3tqyEAwMxLtPZ8Mz5rgtHEQOS72Ie6fZJY -n demo -w /var/home/core
-$
-```
-
-The log saved in the path of [workspace]/qiuniu:
+The log saved in the path of [workspace]/qiuniu, for example:
 ```
 $ ls /var/home/core/qiuniu/
 2022-04-29T08:09:21Z
@@ -119,6 +102,7 @@ drwxrwxr-x.   61 core core   4096 Apr 29 08:09 pv
 drwxrwxr-x.   19 core core   4096 Apr 29 08:09 pvc
 -rwxrwxr-x.    1 core core    211 Apr 29 08:09 qiuniu_description.json
 drwxrwxr-x.    5 core core     79 Apr 29 08:09 role
+drwxrwxr-x.   10 core core    207 Apr 29 08:09 helm
 drwxrwxr-x.   10 core core    207 Apr 29 08:09 role_binding
 drwxrwxr-x.   49 core core   4096 Apr 29 08:09 service
 drwxrwxr-x.    9 core core    137 Apr 29 08:09 service_account
@@ -126,7 +110,7 @@ drwxrwxr-x.   20 core core   4096 Apr 29 08:09 statefulset
 drwxrwxr-x.    7 core core    162 Apr 29 08:09 storage_class
 ```
 
-Here need highlight the pod log cause it include the previous and current container log under the pod, the pod is not only the "pod":
+Here the pod log include the previous and current container log under the path of pod, the pod log is not only the pod, but also container log:
 ```
 $ ls
 current-container  demo-0.json  previous-container
@@ -135,28 +119,9 @@ current-container  demo-0.json  previous-container
 - demo-0.json is the pod log include the pod info, status, etc.
 - current-container and previours-container is the container log under the pod.
 
-The log has been collect in the package which naming with time format, so qiuniu can collect the log in same workspace.
+The log is naming by the time format, so qiuniu can collect different log in same workspace.
 
-## 5. helm
-Collect the helm release log by `qiuniu helm`.
-```
-qiuniu helm -k [kubeconfig_path] -n [namespace] -w [workspace]
-```
-
-For the detail info of kubeconfig, please refer [here](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/)
-
-The log saved in the path of [workspace]/qiuniu/helm, for example:
-```
-$ qiuniu helm -k /var/home/core/kubeconfig -n demo -w /var/home/core
-
-$ pwd
-/var/home/core/qiuniu/helm
-
-$ ls
-2022-05-05T03:01:19Z  2022-05-05T03:02:29Z
-```
-
-## 6. clean
+## 5. clean
 `clean` is to clean the log according to the time interval between the collect time and the current time, for example:
 ```
 $ qiuniu clean -w /var/home/core -i 24
@@ -164,10 +129,26 @@ $ qiuniu clean -w /var/home/core -i 24
 
 It means clean the log over `24h` under workspace `/var/home/core`.
 
-## 7. zip
+If not specific the workspace and interval, qiuniu will clean all logs under the default workspace `$HOME/qiuniu`.
+
+## 6. zip
 `zip` command is used to compress the log to zip, for example:
 ```
 $ qiuniu zip -d /var/home/core/qiuniu
 ```
 
 It means to compress the log under `/var/home/core/qiuniu` to zip package `qiuniu.zip`.
+
+If not specific the dir of zip, qiuniu will zip the directory under `$HOME/qiuniu`.
+
+## 7. service
+`service` is to provide the RestfulAPI mode of qiuniu.
+
+```
+$ ./qiuniu service
+[GIN-debug] Listening and serving HTTP on 0.0.0.0:9189
+```
+
+qiuniu will listening to the localhost and port `9189` by default, can change the serviceIP and servicePort with options `-si` and `-sp`.
+
+For the detailed info of service OpenAPI, please refer here. 

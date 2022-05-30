@@ -1,7 +1,6 @@
 package helmclient
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"github/hxia043/qiuniu/internal/app/config"
@@ -36,7 +35,7 @@ type Options struct {
 	RepositoryConfigPath string
 	RepositoryCachePath  string
 	Debug                bool
-	Kubeconfig           string
+	Kubeconfig           []byte
 	Namespace            string
 	Log                  action.DebugLog
 }
@@ -49,7 +48,7 @@ type ReleaseSpec struct {
 	CreateNamespace bool
 }
 
-func NewOptions(kubeconfig string) *Options {
+func NewOptions(kubeconfig []byte) *Options {
 	return &Options{
 		Kubeconfig: kubeconfig,
 		Log:        logging.NewLogger().Infof,
@@ -63,30 +62,16 @@ func NewHelmClient(options *Options) (Client, error) {
 		return nil, errors.New("error: helm options argument is nil")
 	}
 
-	if options.Kubeconfig == "" {
+	if options.Kubeconfig == nil {
 		return nil, errors.New("error: kubeconfig missing")
 	}
 
-	kubeconfig, err := base64.StdEncoding.DecodeString(options.Kubeconfig)
-	if err != nil {
-		return nil, fmt.Errorf("error: decode kubeconfig failed: %w", err)
-	}
-
-	clientGetter, err := NewRESTClientGetter(kubeconfig)
+	clientGetter, err := NewRESTClientGetter(options.Kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("new rest client getter failed: %w", err)
 	}
 
-	// Helm does not expose Namespace property, it has to be configured in this environment way
-	ns := options.Namespace
-	if ns == "" {
-		ns, _, err = clientGetter.ToRawKubeConfigLoader().Namespace()
-		if err != nil {
-			return nil, fmt.Errorf("get namespace from KubeConfig fail: %w", err)
-		}
-	}
-
-	if err := os.Setenv("HELM_NAMESPACE", ns); err != nil {
+	if err := os.Setenv("HELM_NAMESPACE", options.Namespace); err != nil {
 		return nil, fmt.Errorf("setting namespace fail, %w", err)
 	}
 
